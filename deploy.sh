@@ -41,6 +41,7 @@ sed -i '' "s/_HOST_PATH_/${nfs_host_path}/g"     ./zm_nfs.yaml
 echo "[`date`] - kubectl create zm_nfs"
 kubectl create -f ./zm_nfs.yaml
 
+sleep 2
 zm_nfs_pod_name=`kubectl get pod | grep 'zm-nfs-' | awk '{print $1}'`
 echo "[`date`] - zm_nfs pod name is ${zm_nfs_pod_name}"
 
@@ -74,6 +75,7 @@ cp -afpR ./zm_db.yaml.tpl ./zm_db.yaml
 echo "[`date`] - kubectl create zm_db"
 kubectl create -f ./zm_db.yaml
 
+sleep 2
 zm_db_pod_name=`kubectl get pod | grep 'zm-db' | awk '{print $1}'`
 echo "[`date`] - zm_db pod name is ${zm_db_pod_name}"
 
@@ -112,6 +114,7 @@ sed -i '' "s/_S3_BUCKET_/${s3_bucket}/g" ./zm_server.yaml
 echo "[`date`] - kubectl create zm_server"
 kubectl create -f ./zm_server.yaml
 
+sleep 2
 zm_server_pod_name=`kubectl get pod | grep "${zm_server_basename}" | awk '{print $1}'`
 echo "[`date`] - zm_server pod name is ${zm_server_pod_name}"
 

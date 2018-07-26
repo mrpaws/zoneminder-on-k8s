@@ -39,7 +39,14 @@ spec:
           value: zoneminder
         ports:
         - containerPort: 3306
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: mysqldb
         securityContext:
           privileged: true
+      volumes:
+        - name: mysqldb
+          hostPath:
+            path: /zmdb
       nodeSelector:
         kubernetes.io/hostname: monarch.delimitize.com
