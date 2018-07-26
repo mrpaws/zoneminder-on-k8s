@@ -29,7 +29,7 @@ spec:
     metadata:
       labels:
         app: zm-db
-    namespace: rpi3cameras
+      namespace: rpi3cameras
     spec:
       containers:
       - name: zm-db

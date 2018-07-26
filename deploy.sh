@@ -1,5 +1,6 @@
 #!/bin/bash
-set -eo pipefail
+set -xeo pipefail
+. ~/.bash_profile
 
 nfs_docker_path="/nfs"
 nfs_host_path="/nfs"
@@ -8,6 +9,7 @@ s3_base_host="s3.amazonaws.com"
 s3_key="AKIAIKP4VOW5LAUYDIOQ"
 s3_secret="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"
 s3_bucket="zoneminder-rpi3cameras"
+zm_pod_basename="zoneminder-rpi3cameras"
 
 
 #--------------------------------------------------------
@@ -31,10 +33,10 @@ nfs_host_path=`echo ${nfs_host_path} |  sed 's:\/:\\\/:g'`
 
 cp -afpR ./zm_nfs.yaml.tpl ./zm_nfs.yaml
 
-sed -i "s/_SMB_SERVER_/0/g"                   ./zm_nfs.yaml
-sed -i "s/_NFS_SERVER_/1/g"                   ./zm_nfs.yaml
-sed -i "s/_DOCKER_PATH_/${nfs_docker_path}/g" ./zm_nfs.yaml
-sed -i "s/_HOST_PATH_/${nfs_host_path}/g"     ./zm_nfs.yaml
+sed -i '' "s/_SMB_SERVER_/0/g"                   ./zm_nfs.yaml
+sed -i '' "s/_NFS_SERVER_/1/g"                   ./zm_nfs.yaml
+sed -i '' "s/_DOCKER_PATH_/${nfs_docker_path}/g" ./zm_nfs.yaml
+sed -i '' "s/_HOST_PATH_/${nfs_host_path}/g"     ./zm_nfs.yaml
 
 echo "[`date`] - kubectl create zm_nfs"
 kubectl create -f ./zm_nfs.yaml
@@ -58,7 +60,7 @@ kubectl exec -ti ${zm_nfs_pod_name} server-run
 kubectl exec -ti ${zm_nfs_pod_name} server-run status
 echo "[`date`] - config zm_nfs server done"
 
-nfs_hostport=`kubectl get svc | grep "zm-nfs" | awk '{print $5}' | sed 's/2049:\|\/TCP//g'`
+nfs_hostport=`kubectl get svc | grep "zm-nfs" | awk '{print $5}' | cut -d: -f 2 | cut -d/ -f 1`
 nfs_hostname=`kubectl get pod -o wide | grep "zm-nfs-" | awk '{print $7}'`
 nfs_hostip=`getent hosts ${nfs_hostname} | awk '{print $1}'`
 echo "[`date`] - zm_nfs host ip:port = ${nfs_hostip}:${nfs_hostport}"
@@ -85,7 +87,7 @@ while true; do
     sleep 5
 done
 
-db_hostport=`kubectl get svc | grep "zm-db" | awk '{print $5}' | sed 's/3306:\|\/TCP//g'`
+db_hostport=`kubectl get svc | grep "zm-db" | awk '{print $5}' | cut -d: -f 2 | cut -d/ -f 1`
 db_hostname=`kubectl get pod -o wide | grep "zm-db-" | awk '{print $7}'`
 db_hostip=`getent hosts ${db_hostname} | awk '{print $1}'`
 echo "[`date`] - zm_database host ip:port = ${db_hostip}:${db_hostport}"
@@ -97,24 +99,24 @@ echo "[`date`] - zm_database host ip:port = ${db_hostip}:${db_hostport}"
 echo "[`date`] - set zm_server yaml"
 cp -afpR ./zm_server.yaml.tpl ./zm_server.yaml
 
-sed -i "s/_NFS_PORT_/${nfs_hostport}/g" ./zm_server.yaml
-sed -i "s/_NFS_IP_/${nfs_hostip}/g" ./zm_server.yaml
-sed -i "s/_DB_IP_/${db_hostip}/g" ./zm_server.yaml
-sed -i "s/_DB_PORT_/${db_hostport}/g" ./zm_server.yaml
+sed -i '' "s/_NFS_PORT_/${nfs_hostport}/g" ./zm_server.yaml
+sed -i '' "s/_NFS_IP_/${nfs_hostip}/g" ./zm_server.yaml
+sed -i '' "s/_DB_IP_/${db_hostip}/g" ./zm_server.yaml
+sed -i '' "s/_DB_PORT_/${db_hostport}/g" ./zm_server.yaml
 
-sed -i "s/_S3_BASE_HOST_/${s3_base_host}/g" ./zm_server.yaml
-sed -i "s/_S3_KEY_/${s3_key}/g" ./zm_server.yaml
-sed -i "s/_S3_SECRET_/${s3_secret}/g" ./zm_server.yaml
-sed -i "s/_S3_BUCKET_/${s3_bucket}/g" ./zm_server.yaml
+sed -i '' "s/_S3_BASE_HOST_/${s3_base_host}/g" ./zm_server.yaml
+sed -i '' "s/_S3_KEY_/${s3_key}/g" ./zm_server.yaml
+sed -i '' "s/_S3_SECRET_/${s3_secret}/g" ./zm_server.yaml
+sed -i '' "s/_S3_BUCKET_/${s3_bucket}/g" ./zm_server.yaml
 
 echo "[`date`] - kubectl create zm_server"
 kubectl create -f ./zm_server.yaml
 
-zm_server_pod_name=`kubectl get pod | grep 'zm-server' | awk '{print $1}'`
+zm_server_pod_name=`kubectl get pod | grep "${zm_server_basename}" | awk '{print $1}'`
 echo "[`date`] - zm_server pod name is ${zm_server_pod_name}"
 
 while true; do
-    zm_server_pod_status=`kubectl get pod | grep 'zm-server' | awk '{print $3}'`
+    zm_server_pod_status=`kubectl get pod | grep "${zm_server_basename}" | awk '{print $3}'`
     if [[ "${zm_server_pod_status}" == "Running" ]]; then
         echo "[`date`] - zm_server pod is running."
         break
