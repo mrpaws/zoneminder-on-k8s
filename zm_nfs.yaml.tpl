@@ -4,6 +4,7 @@ metadata:
   name: zm-nfs
   labels:
     app: zm-nfs
+  namespace: rpi3cameras
 spec:
   ports:
   - name: zm-nfs
@@ -21,6 +22,7 @@ metadata:
   name: zm-nfs
   labels:
     app: zm-nfs
+  namespace: rpi3cameras
 spec:
   replicas: 1
   selector:
@@ -47,6 +49,8 @@ spec:
         volumeMounts:
         - mountPath: "_DOCKER_PATH_"
           name: nfs-dir
+      nodeSelector:
+        kubernetes.io/hostname: monarch.delimitize.com
       volumes:
       - name: nfs-dir
         hostPath:

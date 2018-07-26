@@ -1,13 +1,13 @@
 #!/bin/bash
 set -eo pipefail
 
-nfs_docker_path="/mnt"
-nfs_host_path="/mnt"
+nfs_docker_path="/nfs"
+nfs_host_path="/nfs"
 
-s3_base_host="172.22.144.100:7480"
-s3_key="VGIEUMEH2R9PSH6KO8QF"
-s3_secret="moPImbK4aPooOt8Pc4Bt5iWXdq1A5gXLoc2DOWvM"
-s3_bucket="zoneminder"
+s3_base_host="s3.amazonaws.com"
+s3_key="AKIAIKP4VOW5LAUYDIOQ"
+s3_secret="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"
+s3_bucket="zoneminder-rpi3cameras"
 
 
 #--------------------------------------------------------

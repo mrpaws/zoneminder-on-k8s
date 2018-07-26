@@ -4,6 +4,7 @@ metadata:
   name: zm-db
   labels:
     app: zm-db
+  namespace: rpi3cameras
 spec:
   ports:
   - name: zm-db
@@ -28,6 +29,7 @@ spec:
     metadata:
       labels:
         app: zm-db
+    namespace: rpi3cameras
     spec:
       containers:
       - name: zm-db
@@ -39,3 +41,5 @@ spec:
         - containerPort: 3306
         securityContext:
           privileged: true
+      nodeSelector:
+        kubernetes.io/hostname: monarch.delimitize.com

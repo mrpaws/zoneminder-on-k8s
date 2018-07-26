@@ -1,33 +1,35 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: zm-server1
+  namespace: rpi3cameras
+  name: zoneminder-rpi3cameras
   labels:
-    app: zm-server1
+    app: zoneminder-rpi3cameras
 spec:
   ports:
-  - name: zm-server1
+  - name: zoneminder-rpi3cameras
     protocol: TCP
     port: 80
     targetPort: 80
     nodePort: 30080
   type: NodePort
   selector:
-    app: zm-server1
+    app: zoneminder-rpi3cameras
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: zm-server1
+  name: zoneminder-rpi3cameras
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: zm-server1
+        app: zoneminder-rpi3cameras
+      namespace: rpi3cameras
     spec:
       containers:
-      - name: zm-server1
+      - name: zoneminder-rpi3cameras
         image: thisistom/zm_server:v1.30.4
         env:
         - name: DB_HOST
@@ -51,7 +53,4 @@ spec:
         securityContext:
           privileged: true
       nodeSelector:
-        kubernetes.io/hostname: edge
-        
-# to get labels of node      
-# # kubectl get no --show-labels
+        kubernetes.io/hostname: monarch.delimitize.com
