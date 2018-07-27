@@ -47,6 +47,6 @@ spec:
       volumes:
         - name: mysqldb
           hostPath:
-            path: /zmdb
+            path: /zm-db
       nodeSelector:
         kubernetes.io/hostname: monarch.delimitize.com

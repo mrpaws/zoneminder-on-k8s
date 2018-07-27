@@ -2,8 +2,8 @@
 set -xeo pipefail
 . ~/.bash_profile
 
-nfs_docker_path="/nfs"
-nfs_host_path="/nfs"
+nfs_docker_path="/zm-nfs"
+nfs_host_path="/zm-nfs"
 
 s3_base_host="s3.amazonaws.com"
 s3_key="AKIAIKP4VOW5LAUYDIOQ"
