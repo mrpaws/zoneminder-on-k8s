@@ -30,7 +30,8 @@ spec:
     spec:
       containers:
       - name: zoneminder-rpi3cameras
-        image: thisistom/zm_server:v1.30.4
+#        image: thisistom/zm_server:v1.30.4
+        image: thisistom/zm_server_s3_alarm:v1.30.4
         env:
         - name: DB_HOST
           value: "_DB_IP_:_DB_PORT_"
@@ -40,14 +41,6 @@ spec:
           value: "soft,intr,tcp,rw,port=_NFS_PORT_"
         - name: NFS_ZM_PATH 
           value: "_NFS_IP_:/"
-        - name: S3_BASE_HOST
-          value: "_S3_BASE_HOST_"
-        - name: S3_KEY
-          value: "_S3_KEY_"
-        - name: S3_SECRET
-          value: "_S3_SECRET_"
-        - name: S3_BUCKET
-          value: "_S3_BUCKET_"
         ports:
         - containerPort: 80
         securityContext:

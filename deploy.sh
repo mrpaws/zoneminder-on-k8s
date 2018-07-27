@@ -1,13 +1,19 @@
 #!/bin/bash
-set -xeo pipefail
-. ~/.bash_profile
+set -eo pipefail
+
+OS=$(uname -a | awk '{print $1}')
+if [ "${OS}" = "Darwin" ]
+then
+  function getent {
+    name=$(dscacheutil -q host -a name $2 | grep name |  awk '{print $2}');
+    addr=$(dscacheutil -q host -a name $2 | grep ip_address | awk '{print $2}')
+    echo "${addr}       ${name}"
+  }
+fi
 
 nfs_docker_path="/zm-nfs"
 nfs_host_path="/zm-nfs"
 
-s3_base_host="s3.amazonaws.com"
-s3_key="AKIAIKP4VOW5LAUYDIOQ"
-s3_secret="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"
 s3_bucket="zoneminder-rpi3cameras"
 zm_pod_basename="zoneminder-rpi3cameras"
 
@@ -106,20 +112,15 @@ sed -i '' "s/_NFS_IP_/${nfs_hostip}/g" ./zm_server.yaml
 sed -i '' "s/_DB_IP_/${db_hostip}/g" ./zm_server.yaml
 sed -i '' "s/_DB_PORT_/${db_hostport}/g" ./zm_server.yaml
 
-sed -i '' "s/_S3_BASE_HOST_/${s3_base_host}/g" ./zm_server.yaml
-sed -i '' "s/_S3_KEY_/${s3_key}/g" ./zm_server.yaml
-sed -i '' "s/_S3_SECRET_/${s3_secret}/g" ./zm_server.yaml
-sed -i '' "s/_S3_BUCKET_/${s3_bucket}/g" ./zm_server.yaml
-
 echo "[`date`] - kubectl create zm_server"
 kubectl create -f ./zm_server.yaml
 
 sleep 2
-zm_server_pod_name=`kubectl get pod | grep "${zm_server_basename}" | awk '{print $1}'`
+zm_server_pod_name=`kubectl get pod | grep "${zm_pod_basename}" | awk '{print $1}'`
 echo "[`date`] - zm_server pod name is ${zm_server_pod_name}"
 
 while true; do
-    zm_server_pod_status=`kubectl get pod | grep "${zm_server_basename}" | awk '{print $3}'`
+    zm_server_pod_status=`kubectl get pod | grep "${zm_pod_basename}" | awk '{print $3}'`
     if [[ "${zm_server_pod_status}" == "Running" ]]; then
         echo "[`date`] - zm_server pod is running."
         break
